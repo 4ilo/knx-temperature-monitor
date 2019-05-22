@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source /home/olivier/code/projects/knx_temperature_monitor/pcb/pcb.sch)
-    (date "wo 22 mei 2019 11:21:58 CEST")
+    (date "wo 22 mei 2019 14:51:33 CEST")
     (tool "Eeschema 5.1.2")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -772,10 +772,10 @@
       (node (ref A1) (pin 15)))
     (net (code 23) (name /OUT_1)
       (node (ref H3) (pin 5))
-      (node (ref U1) (pin 19)))
+      (node (ref U1) (pin 18)))
     (net (code 24) (name /OUT_0)
       (node (ref H3) (pin 3))
-      (node (ref U1) (pin 18)))
+      (node (ref U1) (pin 19)))
     (net (code 25) (name /OUT_2)
       (node (ref H3) (pin 4))
       (node (ref U1) (pin 20)))

@@ -1203,9 +1203,9 @@ Wire Wire Line
 Wire Wire Line
 	3250 4200 3650 4200
 Text Label 3250 3900 0    50   ~ 0
-OUT_0
-Text Label 3250 4000 0    50   ~ 0
 OUT_1
+Text Label 3250 4000 0    50   ~ 0
+OUT_0
 Text Label 3250 4100 0    50   ~ 0
 OUT_2
 Text Label 3250 4200 0    50   ~ 0
