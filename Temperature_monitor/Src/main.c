@@ -32,10 +32,21 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+#define MAX_INPUTS 10
+typedef struct {
+    uint8_t size;
+    uint16_t pins[MAX_INPUTS];
+    GPIO_TypeDef *ports[MAX_INPUTS];
+
+    uint8_t data[MAX_INPUTS];
+} binaryInData;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+#define BIN_INPUTS 4
 
 /* USER CODE END PD */
 
@@ -120,7 +131,13 @@ int main(void)
 
 
     float temp;
-    char buffer[5];
+
+    binaryInData bin = {
+            BIN_INPUTS,                                                                 // Len
+            {BIN_0_Pin, BIN_1_Pin, BIN_2_Pin, BIN_3_Pin},                               // GPIO pins
+            {BIN_0_GPIO_Port, BIN_1_GPIO_Port, BIN_2_GPIO_Port, BIN_3_GPIO_Port},       // GPIO ports
+    };
+
 
     /* USER CODE END 2 */
 
@@ -131,12 +148,20 @@ int main(void)
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
+
+        // Read temp and show
         temp = MAX31865_readTemp();
+        LCD_print_float(temp, 2, 9, FONT_BIG);
 
-        sprintf(buffer, "%.1fC", temp);
-        LCD_print_large(buffer, 2, 9);
 
-        HAL_Delay(1000);
+        // Read binary inputs, and show on screen
+        for(uint8_t i = 0; i < bin.size; i++)
+        {
+              bin.data[i] = !HAL_GPIO_ReadPin(bin.ports[i], bin.pins[i]);
+              LCD_print_int(bin.data[i], i*21, 5, FONT_SMALL);
+        }
+
+        HAL_Delay(100);
     }
     /* USER CODE END 3 */
 }

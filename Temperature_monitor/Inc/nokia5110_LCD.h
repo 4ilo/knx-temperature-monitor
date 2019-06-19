@@ -21,6 +21,9 @@
 #define LCD_HEIGHT 48
 #define LCD_SIZE (LCD_WIDTH * LCD_HEIGHT / 8)
 
+#define FONT_BIG 1
+#define FONT_SMALL 0
+
 /*
  * @brief GPIO ports used
  */
@@ -59,5 +62,7 @@ void LCD_print(char *str, uint8_t x, uint8_t y);
 void LCD_print_large(char *str, uint8_t x, uint8_t y);
 void LCD_clear();
 void LCD_goXY(uint8_t x, uint8_t y);
+void LCD_print_float(float number, uint8_t x, uint8_t y, uint8_t size);
+void LCD_print_int(uint8_t number, uint8_t x, uint8_t y, uint8_t size);
 
 #endif

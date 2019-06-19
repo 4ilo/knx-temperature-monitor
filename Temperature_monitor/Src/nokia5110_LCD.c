@@ -147,6 +147,28 @@ void LCD_print_large(char *str, uint8_t x, uint8_t y)
     }
 }
 
+void LCD_print_float(float number, uint8_t x, uint8_t y, uint8_t size)
+{
+    char buffer[5];
+    sprintf(buffer, "%.1fC", number);
+
+    if(size == FONT_BIG)
+        LCD_print_large(buffer, x, y);
+    else
+        LCD_print(buffer, x, y);
+}
+
+void LCD_print_int(uint8_t number, uint8_t x, uint8_t y, uint8_t size)
+{
+    char buffer[5];
+    sprintf(buffer, "%d", number);
+
+    if(size == FONT_BIG)
+        LCD_print_large(buffer, x, y);
+    else
+        LCD_print(buffer, x, y);
+}
+
 /*
  * @brief Print a string on the LCD
  * @param x: starting point on the x-axis (column)
