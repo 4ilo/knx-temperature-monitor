@@ -90,6 +90,9 @@ void Error_Handler(void);
 #define LCD_DC_GPIO_Port GPIOB
 #define LCD_DATA_Pin GPIO_PIN_15
 #define LCD_DATA_GPIO_Port GPIOB
+#define DRDY_Pin GPIO_PIN_11
+#define DRDY_GPIO_Port GPIOA
+#define DRDY_EXTI_IRQn EXTI4_15_IRQn
 #define OUT_3_Pin GPIO_PIN_3
 #define OUT_3_GPIO_Port GPIOB
 #define SCL_Pin GPIO_PIN_6
