@@ -1371,4 +1371,14 @@ F 3 "~" H 950 5600 50  0001 C CNN
 $EndComp
 Text Notes 1850 2750 0    50   ~ 0
 Not fitted
+Wire Wire Line
+	1550 5500 1550 5300
+Wire Wire Line
+	1550 5300 1750 5300
+Text Label 1600 5300 0    50   ~ 0
+DRDY
+Wire Wire Line
+	4950 5000 5200 5000
+Text Label 5000 5000 0    50   ~ 0
+DRDY
 $EndSCHEMATC

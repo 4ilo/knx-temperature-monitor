@@ -164,7 +164,7 @@ int main(void)
             {OUT_0_GPIO_Port, OUT_1_GPIO_Port, OUT_2_GPIO_Port, OUT_3_GPIO_Port},       // GPIO ports
             {&b_out0, &b_out1, &b_out2, &b_out3}                                        // Communication objects
     };
-    
+
 
   /* USER CODE END 2 */
 
