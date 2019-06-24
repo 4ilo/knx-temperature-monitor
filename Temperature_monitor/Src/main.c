@@ -166,6 +166,9 @@ int main(void)
     };
 
 
+    uint8_t pool_too_hot = 0;
+    uint8_t send_temp_counter = 0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -179,7 +182,17 @@ int main(void)
         // Read temperature and show on screen, and send to bus
         temperature = MAX31865_readTemp();
         LCD_print_float(temperature, 2, 9, FONT_BIG);
-        KIMaip_Send_Float(temperature, 8);
+
+        // Onlu send temp every 10 seconds
+        if(send_temp_counter == 10)
+        {
+            KIMaip_Send_Float(temperature, 8);
+            send_temp_counter = 0;
+        }
+        else
+        {
+            send_temp_counter++;
+        }
 
         // Update output status
         for(uint8_t i = 0; i < b_out.size; i++)
@@ -200,6 +213,18 @@ int main(void)
             }
         }
 
+        // Logic functions
+        float temp_limit = 30.0;
+        if(temperature >= temp_limit && !pool_too_hot)
+        {
+            pool_too_hot = 1;
+            KIMaip_Send_Bool(1, 10);
+        }
+        else if(temperature < (temp_limit-1) && pool_too_hot)
+        {
+            pool_too_hot = 0;
+            KIMaip_Send_Bool(0, 10);
+        }
         HAL_Delay(1000);
 
     }
