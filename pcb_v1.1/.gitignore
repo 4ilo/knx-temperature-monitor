@@ -1,0 +1,5 @@
+pcb-cache.lib
+*.bak
+*.bck
+*.dcm
+sym-lib-table

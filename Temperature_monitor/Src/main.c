@@ -89,6 +89,7 @@ static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 void init_outputs(binaryOutData *b_out);
+void validate_pool_temp(float temperature);
 
 /* USER CODE END PFP */
 
@@ -149,7 +150,7 @@ int main(void)
     max_gpio.CE_PORT = SS_1_GPIO_Port;
     MAX31865_init(&max_gpio, 3);
 
-    float temperature;
+    float temperature, avg_temp = 0;
 
     binaryInData b_in = {
             BIN_INPUTS,                                                                 // Len
@@ -165,8 +166,6 @@ int main(void)
             {&b_out0, &b_out1, &b_out2, &b_out3}                                        // Communication objects
     };
 
-
-    uint8_t pool_too_hot = 0;
     uint8_t send_temp_counter = 0;
 
   /* USER CODE END 2 */
@@ -181,16 +180,24 @@ int main(void)
 
         // Read temperature and show on screen, and send to bus
         temperature = MAX31865_readTemp();
-        LCD_print_float(temperature, 2, 9, FONT_BIG);
+
 
         // Onlu send temp every 10 seconds
         if(send_temp_counter == 10)
         {
-            KIMaip_Send_Float(temperature, 8);
+            avg_temp = avg_temp / 10;
+            KIMaip_Send_Float(avg_temp, 8);
+            LCD_print_float(avg_temp, 2, 9, FONT_BIG);
+
+            // Logic functions
+            validate_pool_temp(avg_temp);
+
             send_temp_counter = 0;
+            avg_temp = 0;
         }
         else
         {
+            avg_temp += temperature;
             send_temp_counter++;
         }
 
@@ -213,18 +220,7 @@ int main(void)
             }
         }
 
-        // Logic functions
-        float temp_limit = 30.0;
-        if(temperature >= temp_limit && !pool_too_hot)
-        {
-            pool_too_hot = 1;
-            KIMaip_Send_Bool(1, 10);
-        }
-        else if(temperature < (temp_limit-1) && pool_too_hot)
-        {
-            pool_too_hot = 0;
-            KIMaip_Send_Bool(0, 10);
-        }
+
         HAL_Delay(1000);
 
     }
@@ -383,6 +379,23 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     if(GPIO_Pin == DRDY_Pin)
     {
         KIMaip_Handle_Interrupt();
+    }
+}
+
+void validate_pool_temp(float temperature)
+{
+    float temp_limit = 30.0;
+    static uint8_t pool_too_hot = 0;
+
+    if(temperature >= temp_limit && !pool_too_hot)
+    {
+        pool_too_hot = 1;
+        KIMaip_Send_Bool(1, 10);
+    }
+    else if(temperature < (temp_limit-1) && pool_too_hot)
+    {
+        pool_too_hot = 0;
+        KIMaip_Send_Bool(0, 10);
     }
 }
 
