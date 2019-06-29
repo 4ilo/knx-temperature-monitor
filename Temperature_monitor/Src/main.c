@@ -183,7 +183,7 @@ int main(void)
 
 
         // Onlu send temp every 10 seconds
-        if(send_temp_counter == 10)
+        if(send_temp_counter >= 10)
         {
             avg_temp = avg_temp / 10;
             KIMaip_Send_Float(avg_temp, 8);
