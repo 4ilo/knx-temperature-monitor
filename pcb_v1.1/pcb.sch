@@ -283,17 +283,6 @@ F 3 "~" H 3000 5800 50  0001 C CNN
 	1    3000 5800
 	1    0    0    -1  
 $EndComp
-$Comp
-L project_lib:KIMaip A1
-U 1 1 5CF29796
-P 2050 5700
-F 0 "A1" H 1700 6050 50  0000 C CNN
-F 1 "KIMaip" H 2050 6050 50  0000 C CNN
-F 2 "footprint_lib:KIMaip" H 1650 6100 50  0001 C CNN
-F 3 "" H 1650 6100 50  0001 C CNN
-	1    2050 5700
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	2500 5900 2750 5900
 Wire Wire Line
@@ -314,50 +303,6 @@ Wire Wire Line
 Connection ~ 2750 5900
 Wire Wire Line
 	2750 5900 2800 5900
-$Comp
-L power:+3.3V #PWR02
-U 1 1 5CF37090
-P 950 5400
-F 0 "#PWR02" H 950 5250 50  0001 C CNN
-F 1 "+3.3V" H 965 5573 50  0000 C CNN
-F 2 "" H 950 5400 50  0001 C CNN
-F 3 "" H 950 5400 50  0001 C CNN
-	1    950  5400
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:+12V #PWR01
-U 1 1 5CF38058
-P 800 5600
-F 0 "#PWR01" H 800 5450 50  0001 C CNN
-F 1 "+12V" H 815 5773 50  0000 C CNN
-F 2 "" H 800 5600 50  0001 C CNN
-F 3 "" H 800 5600 50  0001 C CNN
-	1    800  5600
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:C_Small C7
-U 1 1 5CF4089C
-P 1350 6050
-F 0 "C7" H 1300 6000 50  0000 C CNN
-F 1 "0.1uf" H 1550 6050 50  0000 C CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" H 1350 6050 50  0001 C CNN
-F 3 "~" H 1350 6050 50  0001 C CNN
-	1    1350 6050
-	-1   0    0    1   
-$EndComp
-$Comp
-L power:GND #PWR05
-U 1 1 5CF425F6
-P 1350 6150
-F 0 "#PWR05" H 1350 5900 50  0001 C CNN
-F 1 "GND" H 1355 5977 50  0000 C CNN
-F 2 "" H 1350 6150 50  0001 C CNN
-F 3 "" H 1350 6150 50  0001 C CNN
-	1    1350 6150
-	1    0    0    -1  
-$EndComp
 $Comp
 L Device:LED_ALT D1
 U 1 1 5CF439D7
@@ -425,9 +370,9 @@ $EndComp
 Wire Wire Line
 	2900 5600 3050 5600
 Text Label 3250 4500 0    50   ~ 0
-SCL
+LCD_DATA
 Text Label 3250 4600 0    50   ~ 0
-SDA
+LCD_DC
 $Comp
 L Device:R R3
 U 1 1 5CE4D210
@@ -463,10 +408,6 @@ Text Label 1100 5700 0    50   ~ 0
 SCL
 Wire Wire Line
 	1550 5800 950  5800
-Wire Wire Line
-	950  5800 950  5750
-Wire Wire Line
-	800  5900 800  5600
 $Comp
 L power:+3.3V #PWR04
 U 1 1 5CE788E9
@@ -501,13 +442,13 @@ Wire Wire Line
 Wire Wire Line
 	5150 4600 4950 4600
 Text Label 5000 4300 0    50   ~ 0
-SS_1
+OUT_0
 Text Label 5000 4400 0    50   ~ 0
-CLK_1
+OUT_1
 Text Label 5000 4500 0    50   ~ 0
-MISO_1
+OUT_3
 Text Label 5000 4600 0    50   ~ 0
-MOSI_1
+OUT_2
 $Comp
 L Connector:Conn_01x08_Female H2
 U 1 1 5CECC60F
@@ -584,21 +525,17 @@ Wire Wire Line
 	7050 1150 7050 1050
 Connection ~ 7050 1050
 Text Label 3250 4900 0    50   ~ 0
-LCD_CLK
+DRDY
 Text Label 3250 5000 0    50   ~ 0
-LCD_RST
-Text Label 3250 5100 0    50   ~ 0
-LCD_CE
+SDA
 Text Label 3250 5200 0    50   ~ 0
-LCD_DC
+SCL
 Text Label 3250 5400 0    50   ~ 0
-LCD_DATA
+MOSI_1
 Wire Wire Line
 	3250 4900 3650 4900
 Wire Wire Line
 	3250 5000 3650 5000
-Wire Wire Line
-	3250 5100 3650 5100
 Wire Wire Line
 	3250 5200 3650 5200
 Wire Wire Line
@@ -862,13 +799,6 @@ Wire Wire Line
 	2350 1200 2350 1300
 Wire Wire Line
 	2250 1300 2350 1300
-Connection ~ 1350 5900
-Wire Wire Line
-	1350 5900 800  5900
-Wire Wire Line
-	1550 5900 1350 5900
-Wire Wire Line
-	1350 5900 1350 5950
 $Comp
 L power:+5V #PWR016
 U 1 1 5D1697D8
@@ -891,22 +821,6 @@ F 3 "" H 4450 1700 50  0001 C CNN
 	1    4450 1700
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	3250 3900 3650 3900
-Wire Wire Line
-	3250 4000 3650 4000
-Wire Wire Line
-	3250 4100 3650 4100
-Wire Wire Line
-	3250 4200 3650 4200
-Text Label 3250 3900 0    50   ~ 0
-OUT_1
-Text Label 3250 4000 0    50   ~ 0
-OUT_0
-Text Label 3250 4100 0    50   ~ 0
-OUT_2
-Text Label 3250 4200 0    50   ~ 0
-OUT_3
 $Comp
 L Connector_Generic:Conn_02x04_Odd_Even H3
 U 1 1 5CF6C558
@@ -957,27 +871,10 @@ Connection ~ 4450 1000
 Wire Wire Line
 	4450 1000 4700 1000
 Wire Wire Line
-	950  5400 950  5450
-$Comp
-L Jumper:SolderJumper_2_Bridged JP5
-U 1 1 5CEE3DFA
-P 950 5600
-F 0 "JP5" V 950 5668 50  0000 L CNN
-F 1 "SolderJumper_2_Bridged" V 995 5668 50  0001 L CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm" H 950 5600 50  0001 C CNN
-F 3 "~" H 950 5600 50  0001 C CNN
-	1    950  5600
-	0    1    1    0   
-$EndComp
-Wire Wire Line
 	1550 5500 1550 5300
 Wire Wire Line
 	1550 5300 1750 5300
 Text Label 1600 5300 0    50   ~ 0
-DRDY
-Wire Wire Line
-	4950 5000 5200 5000
-Text Label 5000 5000 0    50   ~ 0
 DRDY
 Wire Wire Line
 	7100 3750 7400 3750
@@ -1566,7 +1463,7 @@ $EndComp
 Wire Wire Line
 	4950 4700 5150 4700
 Text Label 5000 4700 0    50   ~ 0
-SS_2
+CLK_1
 $Comp
 L Timer_RTC:DS1307Z+ U5
 U 1 1 5D24750F
@@ -1707,4 +1604,52 @@ F 3 "" H 1150 1200 50  0001 C CNN
 	1    1150 1200
 	1    0    0    -1  
 $EndComp
+$Comp
+L power:+3.3V #PWR02
+U 1 1 5CF37090
+P 950 5400
+F 0 "#PWR02" H 950 5250 50  0001 C CNN
+F 1 "+3.3V" H 965 5573 50  0000 C CNN
+F 2 "" H 950 5400 50  0001 C CNN
+F 3 "" H 950 5400 50  0001 C CNN
+	1    950  5400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	950  5400 950  5800
+$Comp
+L project_lib:KIMaip A1
+U 1 1 5CF29796
+P 2050 5700
+F 0 "A1" H 1700 6050 50  0000 C CNN
+F 1 "KIMaip" H 2050 6050 50  0000 C CNN
+F 2 "footprint_lib:KIMaip" H 1650 6100 50  0001 C CNN
+F 3 "" H 1650 6100 50  0001 C CNN
+	1    2050 5700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4950 4800 5150 4800
+Text Label 5000 4800 0    50   ~ 0
+SS_1
+Wire Wire Line
+	4950 4900 5150 4900
+Text Label 5000 4900 0    50   ~ 0
+MISO_1
+Wire Wire Line
+	3250 5300 3650 5300
+Text Label 3250 5300 0    50   ~ 0
+SS_2
+Wire Wire Line
+	3650 4400 3250 4400
+Text Label 3250 4400 0    50   ~ 0
+LCD_CLK
+Wire Wire Line
+	3250 4800 3650 4800
+Text Label 3250 4800 0    50   ~ 0
+LCD_RST
+Wire Wire Line
+	3650 4700 3250 4700
+Text Label 3250 4700 0    50   ~ 0
+LCD_CE
 $EndSCHEMATC
