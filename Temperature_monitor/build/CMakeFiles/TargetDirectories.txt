@@ -1,0 +1,4 @@
+/home/olivier/code/projects/knx_temperature_monitor/Temperature_monitor/build/CMakeFiles/rebuild_cache.dir
+/home/olivier/code/projects/knx_temperature_monitor/Temperature_monitor/build/CMakeFiles/edit_cache.dir
+/home/olivier/code/projects/knx_temperature_monitor/Temperature_monitor/build/CMakeFiles/Temperature_monitor.elf.dir
+/home/olivier/code/projects/knx_temperature_monitor/Temperature_monitor/build/CMakeFiles/UPLOAD.dir
