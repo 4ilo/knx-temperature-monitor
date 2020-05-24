@@ -15,4 +15,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: make
       run: cd Temperature_monitor_1.1/ && make all
-      env: CI: 1
+      env:
+        CI: 1
