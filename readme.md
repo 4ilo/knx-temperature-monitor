@@ -1,3 +1,5 @@
+![C/C++ CI](https://github.com/4ilo/knx-temperature-monitor/workflows/C/C++%20CI/badge.svg)
+
 # KNX temperature monitor
 
 Custom Pt100 temperature probe interface to KNX.
