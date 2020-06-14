@@ -9,6 +9,7 @@ typedef struct {
     uint32_t lux;
     uint8_t power_230v;
     uint8_t power_24v;
+    uint8_t pump_active;
     uint8_t timer;
 }input_values_t;
 
