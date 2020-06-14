@@ -30,6 +30,7 @@
 #include "nokia5110_LCD.h"
 #include "string.h"
 #include "stdio.h"
+#include "types.h"
 
 /* USER CODE END Includes */
 
