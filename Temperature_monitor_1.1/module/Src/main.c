@@ -59,13 +59,6 @@ const osThreadAttr_t defaultTask_attributes = {
     .stack_size = 128 * 4
 };
 
-struct input_values_t {
-    uint8_t power_230v;
-    uint8_t power_24v;
-    uint32_t lux;
-    float water_temp;
-    float outside_temp;
-};
 struct context_t {
     struct input_values_t* input_values;
 };

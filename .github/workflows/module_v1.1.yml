@@ -8,12 +8,19 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: make
       run: cd Temperature_monitor_1.1/ && make all
+      env:
+        CI: 1
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: make
+      run: cd Temperature_monitor_1.1/ && make test
       env:
         CI: 1
