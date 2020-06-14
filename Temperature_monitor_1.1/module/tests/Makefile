@@ -4,11 +4,11 @@ test_logic.c
 
 SRC_DIR := ../Src
 SRCS = \
-Unity/unity.c \
+unity/unity.c \
 $(SRC_DIR)/logic.c
 
 CFLAGS = \
--I Unity \
+-I unity \
 -I ../Inc \
 -DUNITY_OUTPUT_COLOR=1 \
 -Wall -Wextra -Werror

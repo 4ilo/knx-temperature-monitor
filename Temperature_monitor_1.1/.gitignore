@@ -3,3 +3,4 @@ cmake-build-debug/
 build/
 bin/
 ubuntu_arm_none_gcc
+*.o
