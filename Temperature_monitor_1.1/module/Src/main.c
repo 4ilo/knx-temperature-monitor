@@ -61,10 +61,10 @@ const osThreadAttr_t defaultTask_attributes = {
 };
 
 struct context_t {
-    struct input_values_t* input_values;
+    input_values_t* input_values;
 };
 
-struct input_values_t input_values;
+input_values_t input_values;
 struct context_t context = {
     .input_values = &input_values,
 };
@@ -118,7 +118,7 @@ void lcdThread(void* data)
     }
 }
 
-void read_inputs(struct input_values_t* input_values)
+void read_inputs(input_values_t* input_values)
 {
     // Read digital inputs
     input_values->power_230v = HAL_GPIO_ReadPin(BIN_0_GPIO_Port, BIN_0_Pin) ? 0 : 1;

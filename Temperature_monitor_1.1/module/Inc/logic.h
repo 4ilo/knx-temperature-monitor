@@ -3,6 +3,6 @@
 
 #include "types.h"
 
-int run_logic(struct input_values_t*, struct output_values_t*);
+int run_logic(input_values_t*, output_values_t*);
 
 #endif
