@@ -11,7 +11,7 @@ CFLAGS = \
 -I unity \
 -I ../Inc \
 -DUNITY_OUTPUT_COLOR=1 \
--Wall -Wextra -Werror
+-Wall -Wextra -Werror -ggdb
 
 OBJS = $(SRCS:.c=.o)
 OBJS += $(TESTS:.c=.o)
