@@ -28,6 +28,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "nokia5110_LCD.h"
+#include "MAX31865.h"
 #include "string.h"
 #include "stdio.h"
 #include "types.h"
@@ -118,7 +119,7 @@ void lcdThread(void* data)
     }
 }
 
-void read_inputs(input_values_t* input_values)
+void read_inputs(input_values_t* input_values, MAX31865_GPIO* sens_outside)
 {
     // Read digital inputs
     input_values->power_230v = HAL_GPIO_ReadPin(BIN_0_GPIO_Port, BIN_0_Pin) ? 0 : 1;
@@ -126,7 +127,7 @@ void read_inputs(input_values_t* input_values)
 
     // Read temperature
     input_values->water_temp = 15.3;
-    input_values->outside_temp = 21.8;
+    input_values->outside_temp = MAX31865_readTemp(sens_outside);
 
     // Read KNX values
     input_values->lux = 1600;
@@ -136,10 +137,24 @@ void StartDefaultTask(void *argument)
 {
     struct context_t* context = (struct context_t*) argument;
 
+    // Init outside temp sens
+    MAX31865_GPIO sens_outside = {
+        .CE_PORT = SS_2_GPIO_Port,
+        .CE_PIN = SS_2_Pin,
+        .CLK_PORT = CLK_1_GPIO_Port,
+        .CLK_PIN = CLK_1_Pin,
+        .MOSI_PORT = MOSI_1_GPIO_Port,
+        .MOSI_PIN = MOSI_1_Pin,
+        .MISO_PORT = MISO_1_GPIO_Port,
+        .MISO_PIN = MISO_1_Pin,
+    };
+    MAX31865_init(&sens_outside, 2);
+
+
     while(1)
     {
         // Read inputs
-        read_inputs(context->input_values);
+        read_inputs(context->input_values, &sens_outside);
 
         // Logic
 

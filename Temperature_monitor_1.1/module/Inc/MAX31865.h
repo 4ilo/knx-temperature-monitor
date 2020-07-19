@@ -9,6 +9,7 @@
 #define MAX31865_LIB_MAX31865_H
 
 #include "stm32f0xx_hal.h"
+#include "cmsis_os.h"
 
 /********************* MAX31865 registers and config bits *********************/
 #define MAX31865_READ                   0x00
@@ -30,7 +31,7 @@
 /********************* General defines *********************/
 #define ON 1
 #define OFF 0
-#define DELAY(x) HAL_Delay(x)
+#define DELAY(x) osDelay(x)
 
 
 /********************* MAX31865_GPIO pinout struct *********************/
@@ -50,7 +51,7 @@ typedef struct {
 
 
 /********************* Public functions *********************/
-float MAX31865_readTemp();
+float MAX31865_readTemp(MAX31865_GPIO* gpio);
 void MAX31865_init(MAX31865_GPIO *max_gpio, uint8_t wires);
 
 #endif //MAX31865_LIB_MAX31865_H

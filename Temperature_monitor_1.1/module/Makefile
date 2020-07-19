@@ -38,6 +38,7 @@ BUILD_DIR = build
 C_SOURCES =  \
 Src/main.c \
 Src/nokia5110_LCD.c \
+Src/MAX31865.c \
 Src/fonts.c \
 Src/freertos.c \
 Src/stm32f0xx_it.c \
