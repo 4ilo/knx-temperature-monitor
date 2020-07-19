@@ -147,6 +147,9 @@ void StartDefaultTask(void *argument)
         .MOSI_PIN = MOSI_1_Pin,
         .MISO_PORT = MISO_1_GPIO_Port,
         .MISO_PIN = MISO_1_Pin,
+        .counter = 0,
+        .moving_average = 0,
+        .value = 20,
     };
     MAX31865_init(&sens_outside, 2);
 

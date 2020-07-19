@@ -26,7 +26,7 @@
 #define RREF 430                        // Reference resistor
 #define FACTOR 32768                    // 2^15 used for data to resistance conversion
 #define ALPHA 0.003851                  // PT-100 temperature coefficient
-
+#define MAX_AVERAGE 10
 
 /********************* General defines *********************/
 #define ON 1
@@ -47,6 +47,10 @@ typedef struct {
 
     GPIO_TypeDef *MISO_PORT;
     uint16_t MISO_PIN;
+
+    float moving_average;
+    float value;
+    uint8_t counter;
 } MAX31865_GPIO;
 
 

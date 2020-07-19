@@ -219,6 +219,15 @@ float MAX31865_readTemp(MAX31865_GPIO* gpio)
     // Disable bias voltage to reduce power usage
     enableBias(gpio, OFF);
 
-    return temp;
+    gpio->moving_average += temp;
+    gpio->counter++;
+
+    if (gpio->counter >= MAX_AVERAGE) {
+        gpio->value = (gpio->moving_average / MAX_AVERAGE);
+        gpio->moving_average = 0;
+        gpio->counter = 0;
+    }
+
+    return gpio->value;
 }
 /*********************** Begin Public functions *************************/
