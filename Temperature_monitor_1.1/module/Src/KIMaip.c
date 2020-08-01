@@ -4,20 +4,40 @@
 
 #include "KIMaip.h"
 
-extern I2C_HandleTypeDef hi2c1;
-extern CommunicationObject *objects[];
-extern uint8_t object_count;
-
 union {
     float f;
     unsigned char b[4];
 } bytes;
 
-void parse_bool(uint8_t data[], uint16_t* objectNr, uint8_t *b);
-void parse_float(uint8_t data[], uint16_t* objectNr, float * number);
-float half2float(uint16_t half);
+/********** Static functions **********/
+static void parse_bool(uint8_t data[], uint16_t* objectNr, uint8_t *b)
+{
+    *objectNr = (data[0] << 8) | data[1];
+    *b = data[2];
+}
 
-void KIMaip_Send_Bool(uint8_t b, uint16_t objectNr)
+static float half2float(uint16_t half)
+{
+    uint16_t frac = half & 0x7FF;
+    uint8_t exp = (half >> 11) & 0x0F;
+
+    float num = (0.01*frac)*pow(2, exp);
+
+    return num;
+}
+
+static void parse_float(uint8_t data[], uint16_t* objectNr, float * number)
+{
+    uint16_t half;
+
+    *objectNr = (data[0] << 8) | data[1];
+    half = (data[2] << 8) | data[3];
+    *number = half2float(half);
+}
+
+
+/********** public functions **********/
+void KIMaip_Send_Bool(KIMaip_ctx *ctx, uint8_t b, uint16_t objectNr)
 {
     uint8_t data[5] = {0};
 
@@ -27,10 +47,10 @@ void KIMaip_Send_Bool(uint8_t b, uint16_t objectNr)
     data[3] = objectNr & 0xFF;          // Byte 1 and 0 for objectNumber
     data[4] = b ? 1 : 0;
 
-    HAL_I2C_Master_Transmit(&hi2c1, KIMaip_I2C_ADDR, data, 5, 100);
+    HAL_I2C_Master_Transmit(ctx->hi2c, KIMaip_I2C_ADDR, data, 5, 100);
 }
 
-void KIMaip_Send_Float(float number, uint16_t objectNr)
+void KIMaip_Send_Float(KIMaip_ctx *ctx, float number, uint16_t objectNr)
 {
     uint8_t data[8] = {0};
 
@@ -45,13 +65,13 @@ void KIMaip_Send_Float(float number, uint16_t objectNr)
     data[6] = bytes.b[1];
     data[7] = bytes.b[0];
 
-    HAL_I2C_Master_Transmit(&hi2c1, KIMaip_I2C_ADDR, data, 8, 100);
+    HAL_I2C_Master_Transmit(ctx->hi2c, KIMaip_I2C_ADDR, data, 8, 100);
 }
 
-void KIMaip_Handle_Interrupt(void)
+void KIMaip_Handle_Interrupt(KIMaip_ctx *ctx)
 {
     uint8_t buffer[8];
-    HAL_I2C_Master_Receive(&hi2c1, KIMaip_I2C_ADDR, buffer, 8, 100);   // Read incomming data
+    HAL_I2C_Master_Receive(ctx->hi2c, KIMaip_I2C_ADDR, buffer, 8, 100);   // Read incomming data
 
     if (buffer[0] > 1)      // Check if we got a non data byte
     {
@@ -72,45 +92,21 @@ void KIMaip_Handle_Interrupt(void)
             else
                 return;
 
-            for(uint8_t i = 0; i < object_count; i++)
+            // Store received values
+            for(uint8_t i = 0; i < ctx->object_count; i++)
             {
-                if(objects[i]->nr == objectNr)
+                if(ctx->objects[i]->nr == objectNr)
                 {
-                    if(objects[i]->type == KIM_TYPE_BOOL)
+                    if(ctx->objects[i]->type == KIM_TYPE_BOOL)
                     {
-                        objects[i]->Bool = b;
+                        ctx->objects[i]->Bool = b;
                     }
-                    else if(objects[i]->type == KIM_TYPE_FLOAT)
+                    else if(ctx->objects[i]->type == KIM_TYPE_FLOAT)
                     {
-                        objects[i]->Float = number;
+                        ctx->objects[i]->Float = number;
                     }
                 }
             }
         }
     }
-}
-
-void parse_bool(uint8_t data[], uint16_t* objectNr, uint8_t *b)
-{
-    *objectNr = (data[0] << 8) | data[1];
-    *b = data[2];
-}
-
-void parse_float(uint8_t data[], uint16_t* objectNr, float * number)
-{
-    uint16_t half;
-
-    *objectNr = (data[0] << 8) | data[1];
-    half = (data[2] << 8) | data[3];
-    *number = half2float(half);
-}
-
-float half2float(uint16_t half)
-{
-    uint16_t frac = half & 0x7FF;
-    uint8_t exp = (half >> 11) & 0x0F;
-
-    float num = (0.01*frac)*pow(2, exp);
-
-    return num;
 }

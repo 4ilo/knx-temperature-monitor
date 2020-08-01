@@ -19,7 +19,7 @@ static uint8_t validate_pump_high(input_values_t* inputs, uint8_t value)
         pump_high = 1;
     }
 
-    if (inputs->outside_temp >= (TEMP_O_LOW + HYSTERESIS) || inputs->water_temp >= (TEMP_W_LOW + HYSTERESIS)) {
+    if ((inputs->outside_temp >= (TEMP_O_LOW + HYSTERESIS) || inputs->water_temp >= (TEMP_W_LOW + HYSTERESIS)) && !inputs->timer) {
         pump_high = 0;
     }
 

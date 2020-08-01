@@ -228,6 +228,16 @@ void test_timer_starts_pump_high(void)
     ret = run_logic(&inputs, &outputs);
     TEST_ASSERT_FALSE(ret);
     TEST_ASSERT_EQUAL_INT(0, outputs.pump_high);
+
+    // When timer is high and conditions are normal
+    inputs.timer = 1;
+    inputs.outside_temp = 20.0;
+    inputs.water_temp = 20.0;
+
+    // The pump is active
+    ret = run_logic(&inputs, &outputs);
+    TEST_ASSERT_FALSE(ret);
+    TEST_ASSERT_EQUAL_INT(1, outputs.pump_high);
 }
 
 void test_pump_low_has_hysteresis_for_winter(void)

@@ -23,8 +23,14 @@ typedef struct {
     float Float;
 } CommunicationObject;
 
-void KIMaip_Send_Bool(uint8_t b, uint16_t objectNr);
-void KIMaip_Send_Float(float number, uint16_t objectNr);
-void KIMaip_Handle_Interrupt(void);
+typedef struct {
+    I2C_HandleTypeDef* hi2c;
+    uint8_t object_count;
+    CommunicationObject **objects;
+} KIMaip_ctx;
+
+void KIMaip_Send_Bool(KIMaip_ctx*, uint8_t b, uint16_t objectNr);
+void KIMaip_Send_Float(KIMaip_ctx*, float number, uint16_t objectNr);
+void KIMaip_Handle_Interrupt(KIMaip_ctx*);
 
 #endif //KIMAIP_H

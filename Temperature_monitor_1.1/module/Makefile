@@ -38,6 +38,8 @@ BUILD_DIR = build
 C_SOURCES =  \
 Src/main.c \
 Src/nokia5110_LCD.c \
+Src/KIMaip.c \
+Src/logic.c \
 Src/MAX31865.c \
 Src/fonts.c \
 Src/freertos.c \
@@ -57,6 +59,7 @@ Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c \
 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.c \
 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.c \
 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_exti.c \
+Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_iwdg.c \
 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c \
 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c \
 Src/system_stm32f0xx.c \

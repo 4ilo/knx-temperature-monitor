@@ -29,9 +29,11 @@
 #include "task.h"
 #include "nokia5110_LCD.h"
 #include "MAX31865.h"
+#include "KIMaip.h"
 #include "string.h"
 #include "stdio.h"
 #include "types.h"
+#include "logic.h"
 
 /* USER CODE END Includes */
 
@@ -52,6 +54,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c2;
+IWDG_HandleTypeDef hiwdg;
 
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -63,11 +66,37 @@ const osThreadAttr_t defaultTask_attributes = {
 
 struct context_t {
     input_values_t* input_values;
+    output_values_t* output_values;
+    KIMaip_ctx* kimaip_ctx;
 };
 
+
+// KNX communication objects
+#define MAX_KNX_OBJECTS 7
+CommunicationObject lux_value = {KIM_TYPE_FLOAT, 0};
+CommunicationObject water_temp = {KIM_TYPE_FLOAT, 1};
+CommunicationObject timer = {KIM_TYPE_BOOL, 2};
+CommunicationObject alarm_temp_low = {KIM_TYPE_BOOL, 3};
+CommunicationObject alarm_temp_high = {KIM_TYPE_BOOL, 4};
+CommunicationObject alarm_230v = {KIM_TYPE_BOOL, 5};
+CommunicationObject alarm_24v = {KIM_TYPE_BOOL, 6};
+CommunicationObject *knx_objects[MAX_KNX_OBJECTS] = {
+    &lux_value,
+    &water_temp,
+    &timer,
+    &alarm_temp_low,
+    &alarm_temp_high,
+    &alarm_230v,
+    &alarm_24v,
+};
+KIMaip_ctx kimaip_ctx = {&hi2c2, MAX_KNX_OBJECTS, knx_objects};
+
 input_values_t input_values;
+output_values_t output_values;
 struct context_t context = {
     .input_values = &input_values,
+    .output_values = &output_values,
+    .kimaip_ctx = &kimaip_ctx,
 };
 
 /* USER CODE BEGIN PV */
@@ -78,6 +107,7 @@ struct context_t context = {
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C2_Init(void);
+static void MX_IWDG_Init(void);
 void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -103,34 +133,67 @@ void lcdThread(void* data)
     {
         LCD_clear();
 
-        snprintf(buffer, 30, "IN: %d %d", context->input_values->power_230v, context->input_values->power_24v);
+        snprintf(buffer, 30, "Tw: %.2f", context->input_values->water_temp);
         LCD_print(buffer, 0, 0);
 
-        snprintf(buffer, 30, "Tw: %.2f", context->input_values->water_temp);
+        snprintf(buffer, 30, "To: %.2f", context->input_values->outside_temp);
         LCD_print(buffer, 0, 1);
 
-        snprintf(buffer, 30, "To: %.2f", context->input_values->outside_temp);
+        snprintf(buffer, 30, "Lux: %ld", context->input_values->lux);
         LCD_print(buffer, 0, 2);
 
-        snprintf(buffer, 30, "Lux: %ld", context->input_values->lux);
-        LCD_print(buffer, 0, 3);
+        snprintf(buffer, 30, "IN : %d %d / %d", context->input_values->power_230v, context->input_values->power_24v, context->input_values->pump_active);
+        LCD_print(buffer, 0, 4);
+
+        snprintf(buffer, 30, "OUT: %d %d %d %d", context->output_values->pump_low, context->output_values->pump_high, context->output_values->tracing, context->output_values->cover_open);
+        LCD_print(buffer, 0, 5);
 
         osDelay(500);
     }
 }
 
-void read_inputs(input_values_t* input_values, MAX31865_GPIO* sens_outside)
+void read_inputs(input_values_t* input_values, MAX31865_GPIO* sens_outside, MAX31865_GPIO* sens_water, KIMaip_ctx* kimaip)
 {
     // Read digital inputs
     input_values->power_230v = HAL_GPIO_ReadPin(BIN_0_GPIO_Port, BIN_0_Pin) ? 0 : 1;
     input_values->power_24v = HAL_GPIO_ReadPin(BIN_1_GPIO_Port, BIN_1_Pin) ? 0 : 1;
+    input_values->pump_active = HAL_GPIO_ReadPin(BIN_3_GPIO_Port, BIN_3_Pin) ? 0 : 1;
 
     // Read temperature
-    input_values->water_temp = 15.3;
+    input_values->water_temp = MAX31865_readTemp(sens_water);
     input_values->outside_temp = MAX31865_readTemp(sens_outside);
 
     // Read KNX values
-    input_values->lux = 1600;
+    input_values->lux = kimaip->objects[0]->Float;
+    input_values->timer = kimaip->objects[2]->Bool;
+}
+
+void set_outputs(output_values_t* output_values)
+{
+    HAL_GPIO_WritePin(OUT_0_GPIO_Port, OUT_0_Pin, output_values->pump_low);
+    HAL_GPIO_WritePin(OUT_1_GPIO_Port, OUT_1_Pin, output_values->pump_high);
+    HAL_GPIO_WritePin(OUT_2_GPIO_Port, OUT_2_Pin, output_values->tracing);
+    HAL_GPIO_WritePin(OUT_3_GPIO_Port, OUT_3_Pin, output_values->cover_open);
+}
+
+void send_knx(input_values_t* input_values, output_values_t* output_values, KIMaip_ctx* kimaip_ctx)
+{
+    static uint8_t counter = 0;
+
+    if (counter >= 10) {
+        // Send alarms
+        KIMaip_Send_Bool(kimaip_ctx, output_values->alarm_temp_low, 3);
+        KIMaip_Send_Bool(kimaip_ctx, output_values->alarm_temp_high, 4);
+        KIMaip_Send_Bool(kimaip_ctx, output_values->alarm_230v, 5);
+        KIMaip_Send_Bool(kimaip_ctx, output_values->alarm_24v, 6);
+
+        // Send temp
+        KIMaip_Send_Float(kimaip_ctx, input_values->water_temp, 1);
+
+        counter = 0;
+    }
+
+    counter++;
 }
 
 void StartDefaultTask(void *argument)
@@ -153,17 +216,39 @@ void StartDefaultTask(void *argument)
     };
     MAX31865_init(&sens_outside, 2);
 
+    // Init water temp sens
+    MAX31865_GPIO sens_water = {
+        .CE_PORT = SS_1_GPIO_Port,
+        .CE_PIN = SS_1_Pin,
+        .CLK_PORT = CLK_1_GPIO_Port,
+        .CLK_PIN = CLK_1_Pin,
+        .MOSI_PORT = MOSI_1_GPIO_Port,
+        .MOSI_PIN = MOSI_1_Pin,
+        .MISO_PORT = MISO_1_GPIO_Port,
+        .MISO_PIN = MISO_1_Pin,
+        .counter = 0,
+        .moving_average = 0,
+        .value = 20,
+    };
+    MAX31865_init(&sens_water, 3);
+
 
     while(1)
     {
         // Read inputs
-        read_inputs(context->input_values, &sens_outside);
+        read_inputs(context->input_values, &sens_outside, &sens_water, context->kimaip_ctx);
 
         // Logic
+        run_logic(context->input_values, context->output_values);
 
         // Set outputs
-        // Send alarms
-        osDelay(500);
+        set_outputs(context->output_values);
+
+        // Send to knx
+        send_knx(context->input_values, context->output_values, context->kimaip_ctx);
+
+        HAL_IWDG_Refresh(&hiwdg);
+        osDelay(1000);
     }
 }
 
@@ -203,9 +288,12 @@ int main(void)
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
     MX_I2C2_Init();
+    MX_IWDG_Init();
     /* USER CODE BEGIN 2 */
 
     init_lcd();
+    LCD_print("Boot", 0, 0);
+    HAL_Delay(1000);
 
     /* USER CODE END 2 */
 
@@ -301,7 +389,7 @@ static void MX_I2C2_Init(void)
 
     /* USER CODE END I2C2_Init 1 */
     hi2c2.Instance = I2C2;
-    hi2c2.Init.Timing = 0x2000090E;
+    hi2c2.Init.Timing = 0x00101D7C;
     hi2c2.Init.OwnAddress1 = 0;
     hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
     hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -329,6 +417,18 @@ static void MX_I2C2_Init(void)
 
     /* USER CODE END I2C2_Init 2 */
 
+}
+
+static void MX_IWDG_Init(void)
+{
+    hiwdg.Instance = IWDG;
+    hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
+    hiwdg.Init.Window = 4000;
+    hiwdg.Init.Reload = 4000;
+    if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+    {
+      Error_Handler();
+    }
 }
 
 /**
@@ -371,9 +471,12 @@ static void MX_GPIO_Init(void)
 
     /*Configure GPIO pin : DRDY_Pin */
     GPIO_InitStruct.Pin = DRDY_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(DRDY_GPIO_Port, &GPIO_InitStruct);
+
+    HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
     /*Configure GPIO pins : SS_2_Pin MOSI_1_Pin LCD_CLK_Pin LCD_DATA_Pin 
       LCD_DC_Pin LCD_CE_Pin LCD_RST_Pin */
@@ -411,6 +514,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     /* USER CODE BEGIN Callback 1 */
 
     /* USER CODE END Callback 1 */
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if (GPIO_Pin == DRDY_Pin)
+    {
+        KIMaip_Handle_Interrupt(&kimaip_ctx);
+    }
 }
 
 /**
