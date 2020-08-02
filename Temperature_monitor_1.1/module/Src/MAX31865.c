@@ -195,11 +195,11 @@ float MAX31865_readTemp(MAX31865_GPIO* gpio)
 {
     // Activate bias voltage to read sensor data, and wait for the capacitors to fill
     enableBias(gpio, ON);
-    DELAY(10);
+    DELAY(50);
 
     // Perform a single conversion, and wait for the result
     single_shot(gpio);
-    DELAY(65);
+    DELAY(150);
 
     // Read data from max31865 data registers
     uint8_t buffer[2];

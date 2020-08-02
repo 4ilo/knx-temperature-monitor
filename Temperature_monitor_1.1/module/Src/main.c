@@ -161,6 +161,7 @@ void read_inputs(input_values_t* input_values, MAX31865_GPIO* sens_outside, MAX3
 
     // Read temperature
     input_values->water_temp = MAX31865_readTemp(sens_water);
+    osDelay(50);
     input_values->outside_temp = MAX31865_readTemp(sens_outside);
 
     // Read KNX values
