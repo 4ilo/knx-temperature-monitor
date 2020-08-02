@@ -200,6 +200,10 @@ void StartDefaultTask(void *argument)
 {
     struct context_t* context = (struct context_t*) argument;
 
+    // Set both chip select lines high
+    HAL_GPIO_WritePin(SS_1_GPIO_Port, SS_1_Pin, 1);
+    HAL_GPIO_WritePin(SS_2_GPIO_Port, SS_2_Pin, 1);
+
     // Init outside temp sens
     MAX31865_GPIO sens_outside = {
         .CE_PORT = SS_2_GPIO_Port,
@@ -230,7 +234,7 @@ void StartDefaultTask(void *argument)
         .moving_average = 0,
         .value = 20,
     };
-    MAX31865_init(&sens_water, 3);
+    MAX31865_init(&sens_water, 2);
 
 
     while(1)
