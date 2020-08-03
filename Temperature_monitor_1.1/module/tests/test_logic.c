@@ -73,7 +73,7 @@ void test_low_outside_temp_and_water_temp_triggers_pump(void)
     // Pump_high and tracing should be inactive
     ret = run_logic(&inputs, &outputs);
     TEST_ASSERT_FALSE(ret);
-    TEST_ASSERT_NOT_EQUAL_INT(0, outputs.pump_low);
+    TEST_ASSERT_EQUAL_INT(0, outputs.pump_low);
     TEST_ASSERT_EQUAL_INT(0, outputs.tracing);
 }
 

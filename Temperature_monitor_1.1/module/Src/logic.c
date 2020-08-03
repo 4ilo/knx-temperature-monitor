@@ -32,6 +32,8 @@ static uint8_t validate_pump_low(input_values_t* inputs, uint8_t value, uint8_t 
 
     if (pump_high) {
         return 3;  // Force pump low when pump_high is active
+    } else if (value == 3) {
+        pump_low = 0;
     }
 
     if (inputs->outside_temp < TEMP_O_LOW) {
