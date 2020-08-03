@@ -26,9 +26,13 @@ static uint8_t validate_pump_high(input_values_t* inputs, uint8_t value)
     return pump_high;
 }
 
-static uint8_t validate_pump_low(input_values_t* inputs, uint8_t value)
+static uint8_t validate_pump_low(input_values_t* inputs, uint8_t value, uint8_t pump_high)
 {
     uint8_t pump_low = value;
+
+    if (pump_high) {
+        return 3;  // Force pump low when pump_high is active
+    }
 
     if (inputs->outside_temp < TEMP_O_LOW) {
         pump_low = 1;
@@ -103,7 +107,7 @@ static uint8_t validate_alarm_temp_low(input_values_t* inputs, uint8_t value)
 int run_logic(input_values_t* inputs, output_values_t* outputs)
 {
     outputs->pump_high = validate_pump_high(inputs, outputs->pump_high);
-    outputs->pump_low = validate_pump_low(inputs, outputs->pump_low);
+    outputs->pump_low = validate_pump_low(inputs, outputs->pump_low, outputs->pump_high);
     outputs->tracing = validate_tracing(inputs);
     outputs->cover_open = validate_cover_open(inputs, 0);
     outputs->alarm_temp_high = validate_cover_open(inputs, outputs->alarm_temp_high);

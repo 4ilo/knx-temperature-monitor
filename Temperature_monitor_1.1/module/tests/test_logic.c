@@ -27,6 +27,7 @@ void test_low_outside_temp_triggers_pump(void)
 
     // When outside temp is above 5c
     inputs.outside_temp = 6.0;
+    inputs.water_temp = 20.0;
 
     // Pump_low should be active
     ret = run_logic(&inputs, &outputs);
@@ -61,6 +62,7 @@ void test_low_outside_temp_and_water_temp_triggers_pump(void)
     // Pump_high and tracing should be active
     ret = run_logic(&inputs, &outputs);
     TEST_ASSERT_FALSE(ret);
+    TEST_ASSERT_NOT_EQUAL_INT(0, outputs.pump_low);
     TEST_ASSERT_EQUAL_INT(1, outputs.pump_high);
     TEST_ASSERT_EQUAL_INT(1, outputs.tracing);
 
@@ -71,7 +73,7 @@ void test_low_outside_temp_and_water_temp_triggers_pump(void)
     // Pump_high and tracing should be inactive
     ret = run_logic(&inputs, &outputs);
     TEST_ASSERT_FALSE(ret);
-    TEST_ASSERT_EQUAL_INT(0, outputs.pump_high);
+    TEST_ASSERT_NOT_EQUAL_INT(0, outputs.pump_low);
     TEST_ASSERT_EQUAL_INT(0, outputs.tracing);
 }
 
@@ -207,6 +209,7 @@ void test_timer_starts_pump_high(void)
     // The pump is active
     ret = run_logic(&inputs, &outputs);
     TEST_ASSERT_FALSE(ret);
+    TEST_ASSERT_NOT_EQUAL_INT(0, outputs.pump_low);
     TEST_ASSERT_EQUAL_INT(1, outputs.pump_high);
 
     // When timer is low and other conditions are abnormal (cold)
@@ -217,6 +220,7 @@ void test_timer_starts_pump_high(void)
     // The pump is still active
     ret = run_logic(&inputs, &outputs);
     TEST_ASSERT_FALSE(ret);
+    TEST_ASSERT_NOT_EQUAL_INT(0, outputs.pump_low);
     TEST_ASSERT_EQUAL_INT(1, outputs.pump_high);
 
     // When timer is low and other conditions are normal
@@ -237,6 +241,7 @@ void test_timer_starts_pump_high(void)
     // The pump is active
     ret = run_logic(&inputs, &outputs);
     TEST_ASSERT_FALSE(ret);
+    TEST_ASSERT_NOT_EQUAL_INT(0, outputs.pump_low);
     TEST_ASSERT_EQUAL_INT(1, outputs.pump_high);
 }
 
@@ -320,6 +325,7 @@ void test_pump_high_has_hysteresis(void)
     // Pump_high stays active
     ret = run_logic(&inputs, &outputs);
     TEST_ASSERT_FALSE(ret);
+    TEST_ASSERT_NOT_EQUAL_INT(0, outputs.pump_low);
     TEST_ASSERT_EQUAL_INT(1, outputs.pump_high);
 
     // When pump_high is active and the conditions relax below the hysteresis
