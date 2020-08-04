@@ -37,7 +37,7 @@ static void parse_float(uint8_t data[], uint16_t* objectNr, float * number)
 
 
 /********** public functions **********/
-void KIMaip_Send_Bool(KIMaip_ctx *ctx, uint8_t b, uint16_t objectNr)
+void KIMaip_Send_Int(KIMaip_ctx *ctx, uint8_t b, uint16_t objectNr)
 {
     uint8_t data[5] = {0};
 
@@ -45,7 +45,7 @@ void KIMaip_Send_Bool(KIMaip_ctx *ctx, uint8_t b, uint16_t objectNr)
     data[1] = KIM_ValueSend;            // ValueSend command
     data[2] = (objectNr >> 8) & 0xFF;
     data[3] = objectNr & 0xFF;          // Byte 1 and 0 for objectNumber
-    data[4] = b ? 1 : 0;
+    data[4] = b;
 
     HAL_I2C_Master_Transmit(ctx->hi2c, KIMaip_I2C_ADDR, data, 5, 100);
 }

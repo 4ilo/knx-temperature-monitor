@@ -10,6 +10,7 @@
 #define KIM_ValueReceive 0x20
 
 #define KIM_TYPE_BOOL 0
+#define KIM_TYPE_INT 0
 #define KIM_TYPE_FLOAT 1
 
 #include <math.h>
@@ -29,7 +30,7 @@ typedef struct {
     CommunicationObject **objects;
 } KIMaip_ctx;
 
-void KIMaip_Send_Bool(KIMaip_ctx*, uint8_t b, uint16_t objectNr);
+void KIMaip_Send_Int(KIMaip_ctx*, uint8_t b, uint16_t objectNr);
 void KIMaip_Send_Float(KIMaip_ctx*, float number, uint16_t objectNr);
 void KIMaip_Handle_Interrupt(KIMaip_ctx*);
 

@@ -72,7 +72,7 @@ struct context_t {
 
 
 // KNX communication objects
-#define MAX_KNX_OBJECTS 7
+#define MAX_KNX_OBJECTS 8
 CommunicationObject lux_value = {KIM_TYPE_FLOAT, 0};
 CommunicationObject water_temp = {KIM_TYPE_FLOAT, 1};
 CommunicationObject timer = {KIM_TYPE_BOOL, 2};
@@ -80,6 +80,7 @@ CommunicationObject alarm_temp_low = {KIM_TYPE_BOOL, 3};
 CommunicationObject alarm_temp_high = {KIM_TYPE_BOOL, 4};
 CommunicationObject alarm_230v = {KIM_TYPE_BOOL, 5};
 CommunicationObject alarm_24v = {KIM_TYPE_BOOL, 6};
+CommunicationObject pump_status = {KIM_TYPE_INT, 7};
 CommunicationObject *knx_objects[MAX_KNX_OBJECTS] = {
     &lux_value,
     &water_temp,
@@ -88,6 +89,7 @@ CommunicationObject *knx_objects[MAX_KNX_OBJECTS] = {
     &alarm_temp_high,
     &alarm_230v,
     &alarm_24v,
+    &pump_status,
 };
 KIMaip_ctx kimaip_ctx = {&hi2c2, MAX_KNX_OBJECTS, knx_objects};
 
@@ -180,16 +182,21 @@ void set_outputs(output_values_t* output_values)
 void send_knx(input_values_t* input_values, output_values_t* output_values, KIMaip_ctx* kimaip_ctx)
 {
     static uint8_t counter = 0;
+    uint8_t pump_status = 0;
 
     if (counter >= 10) {
         // Send alarms
-        KIMaip_Send_Bool(kimaip_ctx, output_values->alarm_temp_low, 3);
-        KIMaip_Send_Bool(kimaip_ctx, output_values->alarm_temp_high, 4);
-        KIMaip_Send_Bool(kimaip_ctx, output_values->alarm_230v, 5);
-        KIMaip_Send_Bool(kimaip_ctx, output_values->alarm_24v, 6);
+        KIMaip_Send_Int(kimaip_ctx, output_values->alarm_temp_low, 3);
+        KIMaip_Send_Int(kimaip_ctx, output_values->alarm_temp_high, 4);
+        KIMaip_Send_Int(kimaip_ctx, output_values->alarm_230v, 5);
+        KIMaip_Send_Int(kimaip_ctx, output_values->alarm_24v, 6);
 
         // Send temp
         KIMaip_Send_Float(kimaip_ctx, input_values->water_temp, 1);
+
+        // Send pump status
+        pump_status =  (output_values->pump_low ? 1 : 0) + output_values->pump_high;
+        KIMaip_Send_Int(kimaip_ctx, pump_status, 7);
 
         counter = 0;
     }
