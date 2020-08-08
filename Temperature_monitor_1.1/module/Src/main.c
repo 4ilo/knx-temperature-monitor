@@ -173,10 +173,10 @@ void read_inputs(input_values_t* input_values, MAX31865_GPIO* sens_outside, MAX3
 
 void set_outputs(output_values_t* output_values)
 {
-    HAL_GPIO_WritePin(OUT_0_GPIO_Port, OUT_0_Pin, output_values->pump_low);
-    HAL_GPIO_WritePin(OUT_1_GPIO_Port, OUT_1_Pin, output_values->pump_high);
-    HAL_GPIO_WritePin(OUT_2_GPIO_Port, OUT_2_Pin, output_values->tracing);
-    HAL_GPIO_WritePin(OUT_3_GPIO_Port, OUT_3_Pin, output_values->cover_open);
+    HAL_GPIO_WritePin(OUT_0_GPIO_Port, OUT_0_Pin, output_values->pump_low ? 0 : 1);
+    HAL_GPIO_WritePin(OUT_1_GPIO_Port, OUT_1_Pin, output_values->pump_high ? 0 : 1);
+    HAL_GPIO_WritePin(OUT_2_GPIO_Port, OUT_2_Pin, output_values->tracing ? 0 : 1);
+    HAL_GPIO_WritePin(OUT_3_GPIO_Port, OUT_3_Pin, output_values->cover_open ? 0 : 1);
 }
 
 void send_knx(input_values_t* input_values, output_values_t* output_values, KIMaip_ctx* kimaip_ctx)
@@ -184,31 +184,21 @@ void send_knx(input_values_t* input_values, output_values_t* output_values, KIMa
     static uint8_t counter = 0;
     uint8_t pump_status = 0;
 
-    #define MAX_COM 5
-    static uint8_t last_values[MAX_COM] = {0};
-    const uint8_t com_objs[MAX_COM] = {3, 4, 5, 6, 7};
+    //#define MAX_COM 5
+    //static uint8_t last_values[MAX_COM] = {0};
 
     if (counter >= 10) {
-        const uint8_t* values[MAX_COM] = {
-            &output_values->alarm_temp_low,
-            &output_values->alarm_temp_high,
-            &output_values->alarm_230v,
-            &output_values->alarm_24v,
-            &pump_status,
-        };
         pump_status =  (output_values->pump_low ? 1 : 0) + output_values->pump_high;
         if (pump_status && input_values->pump_active == 0) {
             // Pump is driven, but motor drive did not activate
             pump_status = 3;
         }
 
-        // Send alarms and pump status
-        for (uint8_t i = 0; i < MAX_COM; i++) {
-            if (*values[i] != last_values[i]) {
-                KIMaip_Send_Int(kimaip_ctx, *values[i], com_objs[i]);
-                last_values[i] = *values[i];
-            }
-        }
+        KIMaip_Send_Int(kimaip_ctx, output_values->alarm_temp_low, 3);
+        KIMaip_Send_Int(kimaip_ctx, output_values->alarm_temp_high, 4);
+        KIMaip_Send_Int(kimaip_ctx, output_values->alarm_230v, 5);
+        KIMaip_Send_Int(kimaip_ctx, output_values->alarm_24v, 6);
+        KIMaip_Send_Int(kimaip_ctx, pump_status, 7);
 
         // Send temp
         KIMaip_Send_Float(kimaip_ctx, input_values->water_temp, 1);
