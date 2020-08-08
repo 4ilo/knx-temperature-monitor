@@ -197,6 +197,10 @@ void send_knx(input_values_t* input_values, output_values_t* output_values, KIMa
             &pump_status,
         };
         pump_status =  (output_values->pump_low ? 1 : 0) + output_values->pump_high;
+        if (pump_status && input_values->pump_active == 0) {
+            // Pump is driven, but motor drive did not activate
+            pump_status = 3;
+        }
 
         // Send alarms and pump status
         for (uint8_t i = 0; i < MAX_COM; i++) {
