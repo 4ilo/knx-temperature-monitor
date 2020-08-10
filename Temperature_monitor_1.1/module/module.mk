@@ -5,3 +5,6 @@ flash: all
 
 test:
 	$(MAKE) -C tests test
+
+cppcheck:
+	cppcheck Src Inc
