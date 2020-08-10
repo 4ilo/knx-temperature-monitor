@@ -70,9 +70,9 @@ static uint8_t validate_cover_open(input_values_t* inputs, uint8_t value)
 {
     uint8_t cover_open = value;
 
-    // When pump is inactive clear alarm
+    // When pump is inactive keep alarm state
     if (!inputs->pump_active) {
-        return 0;
+        return value;
     }
 
     if (inputs->water_temp >= TEMP_W_HIGH) {
@@ -90,9 +90,9 @@ static uint8_t validate_alarm_temp_low(input_values_t* inputs, uint8_t value)
 {
     uint8_t alarm = value;
 
-    // When pump is inactive clear alarm
+    // When pump is inactive keep alarm state
     if (!inputs->pump_active) {
-        return 0;
+        return value;
     }
 
     if (inputs->water_temp < TEMP_W_LOW) {
